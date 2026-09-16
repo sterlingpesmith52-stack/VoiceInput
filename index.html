@@ -1,102 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name=by"viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Input</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice Input</title>
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
 
-        .widget-container {
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 8px rgba(0,0,0,0.15);
-            box-sizing: border-box;
-        }
+    #app {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
 
-        .widget-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            text-align: center;
-        }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-        .widget-output {
-            width: 100%;
-            min-height: 80px;
-            padding: 12px;
-            border: 1px solid #ccc;
-            background: #fafafa;
-            box-sizing: border-box;
-            margin-bottom: 16px;
-            font-size: 1rem;
-        }
+    #output {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 18px;
+      line-height: 1.4;
+    }
 
-        .widget-button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            background: #0078d4;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+    #startBtn {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 18px;
+      background: #0078ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-        .widget-button:hover {
-            background: #005fa3;
-        }
-    </style>
+    #startBtn:active {
+      background: #005fcc;
+    }
+  </style>
 </head>
 
-<body>l
-    <div class="widget-container">
-        <div class="widget-title">Voice Input</div>
+<body>
+  <div id="app">
+    <h1>Speech to Text Recorder</h1>
 
-        <div id="output" class="widget-output">
-            Tap “Start Voice” and speak.
-        </div>
+    <div id="output">Tap the button and start speaking…</div>
 
-        <button class="widget-button" onclick="startVoice()">
-            Start Voice
-        </button>
-    </div>
+    <button id="startBtn">Start Recording</button>
+  </div>
 
-    <script>
-        function startVoice() {
-            const output = document.getElementById("output");
+  <script>
+    const output = document.getElementById("output");
+    const startBtn = document.getElementById("startBtn");
 
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                output.textContent = "Voice input not supported on this browser.";
-                return;
-            }
+    let recognition;
 
-            const recognition = new SpeechRecognition();
-            recognition.lang = "en-US";
-            recognition.interimResults = false;
+    if ("webkitSpeechRecognition" in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-            output.textContent = "Listening...";
-
-            recognition.start();
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                output.textContent = transcript;
-            };
-
-            recognition.onerror = () => {
-                output.textContent = "Voice input error.";
-            };
+      recognition.onresult = function(event) {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
         }
-    </script>
+        output.textContent = transcript;
+      };
+
+      recognition.onerror = function(event) {
+        output.textContent = "Error: " + event.error;
+      };
+    } else {
+      output.textContent = "Speech recognition not supported on this browser.";
+    }
+
+    startBtn.onclick = function() {
+      if (recognition) {
+        recognition.start();
+        output.textContent = "Listening…";
+      }
+    };
+  </script>
 </body>
 </html>
