@@ -1,106 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Voice Input</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Speech to Text Recorder</title>
 
-  <style>
+<style>
     body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      background: #f5f5f5;
-      font-family: Arial, sans-serif;
-    }
-
-    #app {
-      width: 100%;
-      max-width: 600px;
-      padding: 20px;
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: none;
+        -webkit-text-size-adjust: 100%;
     }
 
     h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      text-align: center;
+        margin: 0 0 12px 0;
+        text-align: left;            /* FIXED: left aligned */
+        font-size: 24px;
+        font-weight: 600;
     }
 
     #output {
-      width: 100%;
-      min-height: 150px;
-      padding: 15px;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 18px;
-      line-height: 1.4;
+        width: 100%;
+        min-height: 140px;
+        background: #f7f7f7;         /* FIXED: light gray output area */
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 10px;               /* FIXED: right padding included */
+        box-sizing: border-box;
+        font-size: 16px;
+        margin-bottom: 12px;
+        white-space: pre-wrap;
     }
 
     #startBtn {
-      width: 100%;
-      padding: 15px;
-      margin-top: 20px;
-      font-size: 18px;
-      background: #0078ff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+        display: inline-block;       /* FIXED: auto-width */
+        background: #0078ff;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: left;            /* FIXED: left aligned */
     }
 
-    #startBtn:active {
-      background: #005fcc;
+    /* Remove blue highlight ring on iPhone */
+    #startBtn:focus,
+    #output:focus {
+        outline: none;
+        box-shadow: none;
+        -webkit-tap-highlight-color: transparent;
     }
-  </style>
+</style>
 </head>
 
 <body>
-  <div id="app">
     <h1>Speech to Text Recorder</h1>
 
     <div id="output">Tap the button and start speaking…</div>
 
     <button id="startBtn">Start Recording</button>
-  </div>
 
-  <script>
-    const output = document.getElementById("output");
-    const startBtn = document.getElementById("startBtn");
+    <script>
+        const output = document.getElementById("output");
+        const startBtn = document.getElementById("startBtn");
 
-    let recognition;
+        let recognition;
 
-    if ("webkitSpeechRecognition" in window) {
-      recognition = new webkitSpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
+        if ("webkitSpeechRecognition" in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
 
-      recognition.onresult = function(event) {
-        let transcript = "";
-        for (let i = 0; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+            recognition.onresult = function(event) {
+                let transcript = "";
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                output.textContent = transcript;
+            };
+
+            recognition.onerror = function(event) {
+                output.textContent = "Error: " + event.error;
+            };
+        } else {
+            output.textContent = "Speech recognition not supported on this browser.";
         }
-        output.textContent = transcript;
-      };
 
-      recognition.onerror = function(event) {
-        output.textContent = "Error: " + event.error;
-      };
-    } else {
-      output.textContent = "Speech recognition not supported on this browser.";
-    }
-
-    startBtn.onclick = function() {
-      if (recognition) {
-        recognition.start();
-        output.textContent = "Listening…";
-      }
-    };
-  </script>
+        startBtn.onclick = function() {
+            if (recognition) {
+                recognition.start();
+                output.textContent = "Listening…";
+            }
+        };
+    </script>
 </body>
 </html>
+
